@@ -1,0 +1,424 @@
+#+TITLE: init.org
+#+AUTHOR: malloc-nbytes
+
+* Functions
+
+** Opening the Init File
+
+** Enable ANSI Color Support in Compilation Buffer
+
+#+begin_src emacs-lisp
+  (require 'ansi-color)
+  (defun colorize-compilation-buffer ()
+    (read-only-mode -1)
+    (ansi-color-apply-on-region compilation-filter-start (point))
+    (read-only-mode 1))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+#+end_src
+
+** Set Transparency
+
+** Untab Makefiles
+
+#+begin_src emacs-lisp
+  (defun untabify-except-makefiles ()
+    "Replace tabs with spaces except in makefiles."
+    (unless (derived-mode-p 'makefile-mode)
+      (untabify (point-min) (point-max))))
+  (add-hook 'before-save-hook 'untabify-except-makefiles)
+#+end_src
+
+** Switch to the compilation buffer
+
+#+begin_src emacs-lisp
+  (defun switch-to-compilation-buffer ()
+    "Switch to the *compilation* buffer if it exists."
+    (interactive)
+    (let ((buf (get-buffer "*compilation*")))
+      (if buf
+          (switch-to-buffer buf)
+        (message "Compilation buffer does not exist"))))
+#+end_src
+
+** Duplicate the current line
+
+#+begin_src emacs-lisp
+  (defun cus/duplicate-line ()
+    "Duplicate the current line."
+    (interactive)
+    (let ((text (buffer-substring (line-beginning-position)
+                                  (line-end-position))))
+      (end-of-line)
+      (newline)
+      (insert text)))
+#+end_src
+
+** Join with line below
+
+#+begin_src emacs-lisp
+  (defun cus/join-with-next-line ()
+    "Join the current line with the next line."
+    (interactive)
+    (end-of-line)
+    (when (not (eobp))
+      (delete-char 1)
+      (just-one-space)))
+#+end_src
+
+** Move text up
+
+#+begin_src emacs-lisp
+  (defun cus/move-text-up ()
+    "Move the current line or active region up by one line."
+    (interactive)
+    (let ((col (current-column)))
+      (if (use-region-p)
+          (let ((beg (region-beginning))
+                (end (region-end)))
+            (let ((text (delete-and-extract-region beg end)))
+              (goto-char beg)
+              (forward-line -1)
+              (let ((new-beg (point)))
+                (insert text)
+                (set-mark new-beg)
+                (goto-char (+ new-beg (length text)))
+                (setq deactivate-mark nil))))
+        (let ((text (delete-and-extract-region
+                     (line-beginning-position)
+                     (min (point-max) (1+ (line-end-position))))))
+          (forward-line -1)
+          (beginning-of-line)
+          (insert text)
+          (forward-line -1)))
+      (move-to-column col)))
+#+end_src
+
+** Move text down
+
+#+begin_src emacs-lisp
+  (defun cus/move-text-down ()
+    "Move the current line or active region down by one line."
+    (interactive)
+    (let ((col (current-column)))
+      (if (use-region-p)
+          (let ((beg (region-beginning))
+                (end (region-end)))
+            (let ((text (delete-and-extract-region beg end)))
+              (goto-char beg)
+              (forward-line 1)
+              (let ((new-beg (point)))
+                (insert text)
+                (set-mark new-beg)
+                (goto-char (+ new-beg (length text)))
+                (setq deactivate-mark nil))))
+        (let ((text (delete-and-extract-region
+                     (line-beginning-position)
+                     (min (point-max) (1+ (line-end-position))))))
+          (forward-line 1)
+          (beginning-of-line)
+          (insert text)
+          (forward-line -1)))
+      (move-to-column col)))
+#+end_src
+
+* Set Variables
+
+#+begin_src emacs-lisp
+  ;; have windows open horizontally instead of vertically.
+  (setq split-width-threshold nil)
+
+  (setq compilation-scroll-output t)
+  (setq package-install-upgrade-built-in t)
+  (setq completion-ignored-extensions
+        (append completion-ignored-extensions
+                '(".exe" ".dll" ".so" ".dylib" ".o" ".a" ".elc" "main")))
+
+  (setq ring-bell-function 'ignore)
+  (setq visible-bell       nil
+        ring-bell-function #'ignore)
+
+  (setq whitespace-style (quote (face spaces tabs space-mark tab-mark)))
+  (setq-default show-trailing-whitespace t)
+  (set-face-background 'trailing-whitespace "yellow")
+
+  ;; Remove confirmation of reverting a PDF buffer.
+  (add-to-list 'revert-without-query "\\(?:.*\\.\\)?pdf\\'")
+
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+  (setq inhibit-startup-screen t)
+
+  (menu-bar-mode 0)
+
+  (tool-bar-mode 0)
+
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+
+  (display-time-mode 1)
+
+  (setq-default indent-tab-mode nil)
+
+  (show-paren-mode 1)
+
+  (setq make-backup-files nil)
+
+  (delete-selection-mode 1)
+
+  (setq display-line-numbers-type 'relative)
+
+  (scroll-bar-mode -1)
+
+  (global-display-line-numbers-mode)
+
+  (cond
+   ((find-font (font-spec :name "Ubuntu Mono-14"))
+    (set-frame-font "Ubuntu Mono-14" nil t)))
+
+  (ido-mode 1)
+  (ido-everywhere 1)
+
+  (setq-default dired-dwim-target t)
+
+  (setq dired-listing-switches "-alh")
+
+  (setq mc/always-run-for-all t)
+
+  (fido-mode 1)
+
+  (add-hook 'compilation-mode-hook
+          (lambda ()
+            (setq truncate-lines nil)))
+#+end_src
+
+* Keybinds
+
+#+begin_src emacs-lisp
+  (define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
+  (define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+
+  (global-set-key (kbd "C-x a")   'align)
+  (global-set-key (kbd "C-<tab>") 'switch-to-compilation-buffer)
+  (global-set-key (kbd "C-c C-j") 'eval-print-last-sexp)
+  (global-set-key (kbd "C-c w")   'global-whitespace-mode)
+  (global-set-key (kbd "C-x C-j") 'dired-jump)
+  (global-set-key (kbd "C-.")     'mark-word)
+  (global-set-key (kbd "C-q")     'undo)
+  (global-set-key (kbd "C-x m")   'delete-other-windows)
+  (global-set-key (kbd "C-x '")   'shell)
+  (global-set-key (kbd "M-k")     'kill-whole-line)
+  (global-set-key (kbd "C-c d")   #'cus/duplicate-line)
+  (global-set-key (kbd "M-j")     #'cus/join-with-next-line)
+  (global-set-key (kbd "M-p")     #'cus/move-text-up)
+  (global-set-key (kbd "M-n")     #'cus/move-text-down)
+  (global-set-key (kbd "C-x -")   'split-window-vertically)
+  (global-set-key (kbd "C-x /")   'split-window-horizontally)
+  (global-set-key (kbd "C-c c")   'compile)
+  (global-set-key (kbd "C-c M-c") 'query-replace)
+  (global-set-key (kbd "C-x M-x") 'grep-find)
+  (global-set-key (kbd "M-g b")   'revert-buffer)
+#+end_src
+
+* Other
+
+#+begin_src emacs-lisp
+  (setq auto-mode-alist
+        (append
+         '(("\\.cob\\'" . cobol-mode)
+           ("\\.cbl\\'" . cobol-mode)
+           ("\\.cpy\\'" . cobol-mode))
+         auto-mode-alist))
+
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (setq c-default-style "bsd")
+              (setq c-basic-offset 4)))
+
+  (add-hook 'c-mode-hook
+            (lambda ()
+              (setq c-basic-offset 8
+                    tab-width 8
+                    indent-tabs-mode nil)))
+
+  (add-hook 'd-mode-hook
+            (lambda ()
+              (setq c-basic-offset 8)
+              (setq indent-tabs-mode nil)))
+
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . js-mode))
+#+end_src
+
+* Modes
+
+** QCL
+
+#+begin_src emacs-lisp
+  (defconst qcl-mode-syntax-table
+    (with-syntax-table (copy-syntax-table)
+      (modify-syntax-entry ?- ". 124b")
+      (modify-syntax-entry ?* ". 23")
+      (modify-syntax-entry ?\n "> b")
+      (modify-syntax-entry ?' "\"") ; Single quote for character literals
+      (modify-syntax-entry ?\" "\"")
+      (modify-syntax-entry ?' ".")
+      (syntax-table))
+    "Syntax table for `qcl-mode'.")
+
+  (defun qcl-indent-line ()
+    "Indent current line."
+    (let (indent
+          boi-p
+          move-eol-p
+          (point (point)))
+      (save-excursion
+        (back-to-indentation)
+        (setq indent (car (syntax-ppss))
+              boi-p (= point (point)))
+        (when (and (eq (char-after) ?\n)
+                   (not boi-p))
+          (setq indent 0))
+        (when boi-p
+          (setq move-eol-p t))
+        (when (or (eq (char-after) ?\))
+                  (eq (char-after) ?\}))
+          (setq indent (1- indent)))
+        (delete-region (line-beginning-position)
+                       (point))
+        (indent-to (* tab-width indent)))
+      (when move-eol-p
+        (move-end-of-line nil))))
+
+  (eval-and-compile
+    (defconst qcl-types
+      '()
+      "Type keywords for Qcl mode.")
+    (defconst qcl-keywords
+      '("if" "else" "true" "false" "null" "$")
+      "Non-type keywords for Qcl mode."))
+
+  (defconst qcl-highlights
+    `((,(concat "\\<" (regexp-opt qcl-types) "\\>")
+        . font-lock-type-face)
+      (,(concat "\\<" (regexp-opt qcl-keywords) "\\>")
+        . font-lock-keyword-face)
+      (,(concat "<" (regexp-opt qcl-keywords) ">")
+        . font-lock-keyword-face)
+      (,(rx (group "\"" (zero-or-more (not (any "\"" "\\"))) (zero-or-one "\\\"") "\""))
+        . font-lock-string-face) ; String literals
+      (,(rx (group "'" (any "a-zA-Z0-9") "'"))
+        . font-lock-string-face) ; Character literals
+      (,(rx (group "--" (zero-or-more (not (any "\n"))))
+            (group-n 1 (zero-or-more (any "\n"))))
+       (1 font-lock-comment-delimiter-face)
+       (2 font-lock-comment-face nil t))))
+
+  ;;;###autoload
+  (define-derived-mode qcl-mode prog-mode "qcl"
+    "Major Mode for editing Qcl source code."
+    :syntax-table qcl-mode-syntax-table
+    (setq font-lock-defaults '(qcl-highlights))
+    (setq-local comment-start "--")
+    (setq-local indent-tabs-mode nil)
+    (setq-local tab-width 8)
+    (setq-local indent-line-function #'qcl-indent-line)
+    (setq-local standard-indent 2))
+
+  ;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.qcl\\'" . qcl-mode))
+
+  (provide 'qcl-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Earl mode
+  (defconst earl-mode-syntax-table
+    (with-syntax-table (copy-syntax-table)
+      (modify-syntax-entry ?- "w")
+      (modify-syntax-entry ?* ". 23")
+      (modify-syntax-entry ?\n "> b")
+      (modify-syntax-entry ?# "< b")
+      (modify-syntax-entry ?\' "\"")
+      (modify-syntax-entry ?\\ "\\")
+      (syntax-table))
+    "Syntax table for `earl-mode'.")
+
+  (defun earl-indent-line ()
+    "Indent current line."
+    (let (indent
+          boi-p
+          move-eol-p
+          (point (point)))
+      (save-excursion
+        (back-to-indentation)
+        (setq indent (car (syntax-ppss))
+              boi-p (= point (point)))
+        (when (and (eq (char-after) ?\n)
+                   (not boi-p))
+          (setq indent 0))
+        (when boi-p
+          (setq move-eol-p t))
+        (when (or (eq (char-after) ?\))
+                  (eq (char-after) ?\}))
+          (setq indent (1- indent)))
+        (delete-region (line-beginning-position)
+                       (point))
+        (indent-to (* tab-width indent)))
+      (when move-eol-p
+        (move-end-of-line nil))))
+
+  (eval-and-compile
+    (defconst earl-keywords
+      '("if" "else" "while" "let" "void" "int"
+        "str" "for" "foreach" "fn" "return" "break"
+        "struct" "char" "import" "in" "module"
+        "class" "true" "false" "none" "match"
+        "when" "constructor" "this" "enum"
+        "full" "almost" "float" "tuple" "list"
+        "bool" "to" "continue" "option" "file"
+        "unit" "real" "any" "as" "dictionary"
+        "loop" "closure" "use" "exec" "case" "of"
+        "with" "bind" "try" "catch"
+        ;; intrinsic functions
+        "print" "println" "assert" "len" "open"
+        "type" "unimplemented" "input" "help"
+        "some" "argv" "exit" "env" "init_seed"
+        "panic" "fprintln" "fprint" "random"
+        "typeof" "Dict" "warn" "sleep" "datetime"
+        "set_flag" "unset_flag" "cos" "sin" "observe"
+        "copy" "cd" "Regex" "persist" "persist_lookup" "persist_del"
+        "format" "REPL_input"
+        ;; private intrinsic functions
+        "__internal_move__" "__internal_mkdir__"
+        "__internal_ls__"
+        ;; list member intrinsics
+        ;; function attributes
+        "world" "pub" "ref" "const"
+        "experimental"
+        ;; builtin idents
+        "__FILE__" "__FUNC__" "__OS__" "__MODULE__"
+        ;; Stdlib Modules
+        "IO" "List" "Math" "Stack" "Utils"
+        "Str" "Tree" "Set" "Queue" "System"
+        "Char" "CSV" "Encryption" "Matrix"
+        )))
+
+  (defconst earl-highlights
+    `((,(rx (group "#" (zero-or-more nonl))) . font-lock-comment-face)
+      (,(regexp-opt earl-keywords 'symbols) . font-lock-keyword-face)))
+
+  ;;;###autoload
+  (define-derived-mode earl-mode prog-mode "earl"
+    "Major Mode for editing Earl source code."
+    :syntax-table earl-mode-syntax-table
+    (setq font-lock-defaults '(earl-highlights))
+    (setq-local comment-start "#")
+    (setq-local indent-tabs-mode nil)
+    (setq-local tab-width 4)
+    (setq-local indent-line-function #'earl-indent-line)
+    (setq-local standard-indent 2))
+
+  ;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.rl\\'" . earl-mode))
+
+  (provide 'earl-mode)
+  ;; End Earl mode
+#+end_src
