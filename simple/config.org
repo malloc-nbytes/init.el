@@ -124,6 +124,9 @@
 * Set Variables
 
 #+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+  (load-theme 'cus t)
+
   ;; have windows open horizontally instead of vertically.
   (setq split-width-threshold nil)
 
