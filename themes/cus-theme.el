@@ -63,7 +63,8 @@
    `(dired-marked ((,class (:foreground "#ffdd33" :weight bold))))
    `(dired-perm ((,class (:foreground ,dired-perm))))
    `(dired-symlink ((,class (:foreground ,dired-sym))))
-   `(dired-header ((,class (:foreground "#7ec0ee" :weight bold :underline t))))
+   ;;`(dired-header ((,class (:foreground "#7ec0ee" :weight bold :underline t))))
+   `(dired-header ((,class (:foreground ,dired-dir :weight bold :underline t))))
 
    ;; Additional dired faces (common in dired+ / modern setups)
    `(dired-executable ((,class (:foreground ,dired-exec))))
