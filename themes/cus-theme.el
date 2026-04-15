@@ -16,8 +16,9 @@
       (variable    "#c0caf5")
       (builtin     "#ffdd33")
 
+      (cyan   "#7ec0ee")
+      (white   "#ffffff")
       ;; Dired colors
-      ;;(dired-dir   "#7ec0ee")      ; directories (cyan/blue)
       (dired-dir   "#ffdd33")      ; directories
       (dired-exec  "#98c379")      ; executables
       (dired-perm  "#bbbbbb")      ; permissions
@@ -58,28 +59,27 @@
    `(font-lock-doc-face ((,class (:foreground "#8a8a8a"))))
 
    ;; Dired
-   `(dired-directory ((,class (:foreground ,dired-dir :weight bold))))
+   `(dired-directory ((,class (:foreground ,dired-dir))))
    `(dired-flagged ((,class (:foreground "#ff6666" :weight bold))))
    `(dired-marked ((,class (:foreground "#ffdd33" :weight bold))))
    `(dired-perm ((,class (:foreground ,dired-perm))))
    `(dired-symlink ((,class (:foreground ,dired-sym))))
-   ;;`(dired-header ((,class (:foreground "#7ec0ee" :weight bold :underline t))))
    `(dired-header ((,class (:foreground ,dired-dir :weight bold :underline t))))
 
-   ;; Additional dired faces (common in dired+ / modern setups)
+   ;; Additional dired faces
    `(dired-executable ((,class (:foreground ,dired-exec))))
    `(dired-ignored ((,class (:foreground "#666666"))))
    `(dired-subtree ((,class (:inherit dired-directory))))  ; if using dired-subtree
 
    ;; Minibuffer / find-file fixes
    `(minibuffer-prompt ((,class (:foreground ,fg :weight normal))))
-   `(icomplete-first-match ((,class (:foreground ,keyword :weight bold))))   ; main match
-   `(icomplete-selected-match ((,class (:foreground ,keyword :weight bold))))
-   `(ido-first-match ((,class (:foreground ,keyword :weight bold))))
-   `(ido-only-match ((,class (:foreground ,keyword :weight bold))))         ; fixes the green "only option"
-   `(ido-subdir ((,class (:foreground ,dired-dir :weight bold))))           ; directories in find-file/ido
+   `(icomplete-first-match ((,class (:foreground ,white :weight bold))))   ; main match
+   `(icomplete-selected-match ((,class (:foreground ,white :weight bold))))
+   `(ido-first-match ((,class (:foreground ,white :weight bold))))
+   `(ido-only-match ((,class (:foreground ,white :weight bold))))
+   `(ido-subdir ((,class (:foreground ,dired-dir :weight bold))))
 
-   ;; Fallback for built-in completion (Emacs 27+ / 28+)
+   ;; Fallback for built-in completion
    `(completions-first-match ((,class (:foreground ,keyword :weight bold))))
    `(completions-highlight ((,class (:foreground ,keyword :weight bold))))
 
