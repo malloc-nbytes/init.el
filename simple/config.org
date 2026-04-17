@@ -219,6 +219,7 @@
   (global-set-key (kbd "C-c M-c") 'query-replace)
   (global-set-key (kbd "C-x M-x") 'grep-find)
   (global-set-key (kbd "M-g b")   'revert-buffer)
+  (global-set-key (kbd "C-=")     'mark-sexp)
 #+end_src
 
 * Other
