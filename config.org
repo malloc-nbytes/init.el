@@ -252,9 +252,6 @@
 
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . js-mode))
 
-(add-to-list 'auto-mode-alist '("\\.f90\\'" . fortran-mode))
-(setq fortran-continuation-indent 8)
-(setq fortran-indent-level 8)
 #+end_src
 
 * Modes
