@@ -53,7 +53,7 @@
    `(font-lock-variable-name-face ((,class (:foreground ,fg))))
    ;;`(font-lock-constant-face ((,class (:foreground ,constant))))
    `(font-lock-constant-face ((,class (:foreground ,fg))))
-   `(font-lock-string-face ((,class (:foreground ,string))))
+   `(font-lock-string-face ((,class (:foreground ,string :underline t))))
    `(font-lock-comment-face ((,class (:foreground ,comment :slant italic))))
    `(font-lock-comment-delimiter-face ((,class (:foreground ,comment))))
    `(font-lock-doc-face ((,class (:foreground "#8a8a8a"))))
