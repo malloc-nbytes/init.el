@@ -131,9 +131,6 @@
   ;; Set js mode to 2 spaces
   (setq js-indent-level 2)
 
-  ;; Set cursor to beam
-  (setq-default cursor-type 'bar)
-
   ;; have windows open horizontally instead of vertically.
   (setq split-width-threshold nil)
 
