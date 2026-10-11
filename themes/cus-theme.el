@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (deftheme cus
   "Custom dark theme")
 

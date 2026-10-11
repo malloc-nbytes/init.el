@@ -8,6 +8,7 @@
 ** Enable ANSI Color Support in Compilation Buffer
 
 #+begin_src emacs-lisp
+;; -*- lexical-binding: t; -*-
   (require 'ansi-color)
   (defun colorize-compilation-buffer ()
     (read-only-mode -1)
@@ -126,6 +127,12 @@
 #+begin_src emacs-lisp
   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
   (load-theme 'cus t)
+
+  ;; Set js mode to 2 spaces
+  (setq js-indent-level 2)
+
+  ;; Set cursor to beam
+  (setq-default cursor-type 'bar)
 
   ;; have windows open horizontally instead of vertically.
   (setq split-width-threshold nil)
